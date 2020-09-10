@@ -1,0 +1,18 @@
+{
+  "author": "Grouparoo Inc <hello@grouparoo.com>",
+  "name": "db_watch",
+  "description": "Watching a database and logging differences",
+  "version": "0.1.0",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "dependencies": {
+    "sequelize": "^5.22.3",
+    "yargs": "^15.3.1"
+  },
+  "devDependencies": {
+    "prettier": "^2.0.2"
+  }
+}
