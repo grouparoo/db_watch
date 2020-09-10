@@ -9,6 +9,9 @@
     "node": ">=12.0.0"
   },
   "dependencies": {
+    "dotenv": "^8.2.0",
+    "mysql2": "^2.1.0",
+    "pg": "^8.3.3",
     "sequelize": "^5.22.3",
     "yargs": "^15.3.1"
   },
