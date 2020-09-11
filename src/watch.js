@@ -20,7 +20,9 @@ class Watcher {
     this.client = this.createClient();
     this.query = vargs.query || process.env.WATCH_QUERY;
     this.primaryKey = vargs.key || process.env.WATCH_PRIMARY_KEY;
-    this.watchColumn = vargs.timestamp || process.env.WATCH_TIMESTAMP;
+    this.columns = (vargs.columns || process.env.WATCH_COLUMNS || "")
+      .split(",")
+      .map((col) => col.trim());
     this.pollMs = parseInt(vargs.poll || process.env.POLL_MS || 1000);
     this.header = false;
     this.saved = {};
@@ -62,25 +64,32 @@ class Watcher {
       this.header = table;
     }
 
-    if (!keys.includes(this.watchColumn)) {
-      throw new Error(`watch column not returned: ${this.watchColumn}`);
+    if (this.columns.length === 0) {
+      throw new Error(`no columns to watch given`);
+    } else {
+      for (const col of this.columns) {
+        if (!keys.includes(col)) {
+          throw new Error(`watch column not returned: ${col}`);
+        }
+      }
     }
+
     if (!keys.includes(this.primaryKey)) {
       throw new Error(`primary key not returned: ${this.primaryKey}`);
     }
 
     for (const row of rows) {
       const guid = row[this.primaryKey].toString();
-      const watermark = row[this.watchColumn].toString();
+      const checksum = this.buildChecksum(row);
 
       if (guid.length === 0) {
         throw new Error(`no primary key! ${JSON.stringify(row)}`);
       }
       const current = this.saved[guid];
-      if (current == watermark) {
+      if (current == checksum) {
         continue; // it's the same! only showing changes
       }
-      this.saved[guid] = watermark;
+      this.saved[guid] = checksum;
 
       const values = keys.map((key) => row[key] || "null");
       table.push([now.toString()].concat(values));
@@ -89,5 +98,13 @@ class Watcher {
     if (output.length > 0) {
       console.log(output);
     }
+  }
+
+  buildChecksum(row) {
+    const values = [];
+    for (const col of this.columns) {
+      values.push(row[col].toString());
+    }
+    return values.join("|~|||~|");
   }
 }

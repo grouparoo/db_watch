@@ -15,7 +15,7 @@ WATCH_QUERY="SELECT * FROM users WHERE id = 42"
 WATCH_PRIMARY_KEY="id"
 
 # Timestamp column updated when it changes
-WATCH_TIMESTAMP="updated_at"
+WATCH_COLUMNS="updated_at"
 ```
 
 Then run it:
